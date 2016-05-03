@@ -1,0 +1,2 @@
+# PalmerWeather
+Palmer weather code
