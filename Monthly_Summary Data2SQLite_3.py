@@ -14,6 +14,16 @@ for this data is Summary1989_2003.
 This was the time period that the RA created the summary using analog 
 instruments- i.e. no automatic weather station. All data collected using 
 chart recorders, etc.
+
+The program first reads the file in and determines what line to start
+the import. It handles the exception if the file does not exist. The file 
+is read line by line and a regular expression scans the line and determines
+the number of groups found. This is looking for the start of the columns
+of data. 
+
+Next, the file is read in using the read_csv function of pandas starting
+at the row found previously. Once the data is in a dataframe, it is 
+manipulated and put into the proper form.
 '''
 
 import re
@@ -96,6 +106,11 @@ for year in range(1989,2004, 1):
 # SSTseries and SeaIceseries
             for i, boolean in enumerate(SST_SeaIce_Bool):
                 if boolean:
+            #Now, convert the SST value to a number. The SST data is 
+            #in this form:
+            # ssnnn where ss indicates the sign, 00 is positive, 01 is negative
+            #             nnn is the value in tenths
+
                     SSTseries[i] = MonthData.iloc[i,16][:5]
                     if SSTseries[i][:2] == '01':
                         SSTseries[i] = -1*int(SSTseries[i][2:])/10
@@ -103,21 +118,13 @@ for year in range(1989,2004, 1):
                         SSTseries[i] = int(SSTseries[i][2:])/10
                     else:
                         SSTseries[i] = np.nan                    
-                    SeaIceseries[i] = MonthData.iloc[i,16][5:]
-
-#Now, convert the SST value to a number. The SST data is in this form:
-# ssnnn where ss indicates the sign, 00 is positive, 01 is negative
-#             nnn is the value in tenths
-
-#Save the data from SeaIceseries into the old column that had SST and
-#SeaIce data
-                   
+                    SeaIceseries[i] = MonthData.iloc[i,16][5:]                   
                 else:
                     SSTseries[i] = np.nan    
                     SeaIceseries[i] = np.nan
 
 #Name the columns in the data frame using the column list defined above.
-            MonthData.columns = columns2004
+            MonthData.columns = columns2003
             
             MonthData['SeaIce'] = SeaIceseries            
             MonthData['SST'] = SSTseries
